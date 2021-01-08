@@ -141,7 +141,7 @@ namespace WinDBToBackEndGenerator.Libs
             //namespace WinDBToBackEndGenerator
             stringBuilder.AppendLine("using System;");
             stringBuilder.AppendLine("using System.Collections.Generic;");
-            stringBuilder.AppendLine("namespace " + namespacename + " {\n");
+            stringBuilder.AppendLine("namespace " + namespacename + ".Models {\n");
             stringBuilder.AppendLine("public class " + prefix + tableName + "{\n");
             foreach (DataRow item in schema.Rows)
             {
@@ -178,6 +178,9 @@ namespace WinDBToBackEndGenerator.Libs
                     retValue = "decimal";
                     break;
                 case "datetime":
+                    retValue = "DateTime";
+                    break;
+                case "date":
                     retValue = "DateTime";
                     break;
                 case "bit":
@@ -607,8 +610,8 @@ namespace WinDBToBackEndGenerator.Libs
             stringBuilder.AppendLine("using System.Collections.Generic;");
             stringBuilder.AppendLine("using System.Data.SqlClient;");
             stringBuilder.AppendLine("using System.Data;");
-
-            stringBuilder.AppendLine("namespace " + namespacename + " {\n");
+            stringBuilder.AppendLine("using " + namespacename + ".Models;");
+            stringBuilder.AppendLine("namespace " + namespacename + ".DAL {\n");
             stringBuilder.AppendLine("public class " + prefix + tableName + "Dal {\n");
         
             script = GenerateInsertMethod(tableName, schema,prefix);
@@ -703,15 +706,23 @@ namespace WinDBToBackEndGenerator.Libs
         private string GenerateDetailMethod(string tableName, DataTable schema, string prefix="")
         {
             StringBuilder stringBuilder = new StringBuilder();
+            bool isIdentityFound = false;
             for (int i = 0; i < schema.Rows.Count; i++)
             {
                 DataRow item = schema.Rows[i];
                 if (CheckIdentity(tableName, item["COLUMN_NAME"].ToString()))
                 {
                     stringBuilder.AppendLine("internal "+ tableName +" Detail" + tableName + "(" + SqlToCSharpDBType(item["DATA_TYPE"].ToString()) + " " + item["COLUMN_NAME"].ToString() + ") {");
+                    isIdentityFound = true;
                 }
             }
-             stringBuilder.AppendLine(tableName+" model =new "+ tableName + "();");
+            //if (!isIdentityFound)
+            //{
+            //    stringBuilder.AppendLine("internal " + tableName + " Detail" + tableName + "(" + SqlToCSharpDBType(item["DATA_TYPE"].ToString()) + " " + item["COLUMN_NAME"].ToString() + ") {");
+
+            //}
+
+            stringBuilder.AppendLine(tableName+" model =new "+ tableName + "();");
             stringBuilder.AppendLine("try{");
             stringBuilder.AppendLine("using (SqlConnection db = new SqlConnection(Util.GetConnection())){");
             stringBuilder.AppendLine("db.Open();");
@@ -780,15 +791,20 @@ namespace WinDBToBackEndGenerator.Libs
         private string GenerateDeleteMethod(string tableName, DataTable schema, string prefix)
         {
             StringBuilder stringBuilder = new StringBuilder();
+            bool isIdentityFound = false;
             for (int i = 0; i < schema.Rows.Count; i++)
             {
                 DataRow item = schema.Rows[i];
                 if (CheckIdentity(tableName, item["COLUMN_NAME"].ToString()))
                 {
                     stringBuilder.AppendLine("internal void Delete" + tableName + "("+ SqlToCSharpDBType(item["DATA_TYPE"].ToString()) + " "+ item["COLUMN_NAME"].ToString() + ") {");
+                    isIdentityFound = true;
                 }
             }
-           // stringBuilder.AppendLine("internal void Delete" + tableName + "(" + prefix + tableName + " model) {");
+            if (!isIdentityFound)
+            {
+                stringBuilder.AppendLine("internal void Delete" + tableName + "(" + prefix + tableName + " model) {");
+            }
             stringBuilder.AppendLine("try{");
             stringBuilder.AppendLine("using (SqlConnection db = new SqlConnection(Util.GetConnection())){");
             stringBuilder.AppendLine("db.Open();");
