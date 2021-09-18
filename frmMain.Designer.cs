@@ -227,6 +227,7 @@
             this.lstTables.ItemHeight = 16;
             this.lstTables.Location = new System.Drawing.Point(16, 37);
             this.lstTables.Name = "lstTables";
+            this.lstTables.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
             this.lstTables.Size = new System.Drawing.Size(444, 404);
             this.lstTables.TabIndex = 0;
             // 
