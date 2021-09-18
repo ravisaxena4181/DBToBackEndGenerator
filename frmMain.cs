@@ -74,7 +74,7 @@ namespace WinDBToBackEndGenerator
             sqlObjectLibs.DeleteFolder(Path.Combine(Application.StartupPath, "Models"));
             sqlObjectLibs.DeleteFolder(Path.Combine(Application.StartupPath, "DBScript"));
             sqlObjectLibs.DeleteFolder(Path.Combine(Application.StartupPath, "DAL"));
-            foreach (var item in lstTables.Items)
+            foreach (var item in lstTables.SelectedItems)
             {
                 string classNamealtered = item.ToString().Replace("_", "");
                 classNamealtered = classNamealtered.Substring(0, 1).ToUpper() + "" + classNamealtered.Substring(1, classNamealtered.Length - 1);
